@@ -1,0 +1,27 @@
+<div class="login-container">
+    <div class="header">
+      <h2>PROMOCIONES - NBO NBA</h2>
+    </div>
+  
+    <div class="login-box">
+      <div class="logo-container">
+        <img src="https://img.onesignal.com/permanent/d06b9ca0-29c7-4577-b943-0ccc2296219a/Tu7HBEpfSTWvBwK79mUr_c6590db6-61f1-4548-9de5-ad662e8cd4f0.png" alt="Claro" class="claro-logo" />
+        <img src="https://upload.wikimedia.org/wikipedia/commons/5/56/Logo_de_Am%C3%A9rica_M%C3%B3vil.svg" alt="America Movil" class="america-movil-logo" />
+      </div>
+      <div class="login-info">
+        <div>
+          <label>Usuario</label>
+          <input type="text" id="username" [(ngModel)]="usuario_login.username" name="username" required />
+        </div>
+        <div>
+          <label>Contraseña</label>
+          <input type="password" id="password" [(ngModel)]="usuario_login.password" name="password" required />
+        </div>
+      </div>
+  
+      <div class="login-button">
+        <button type="button" (click)="login()">Ingresar</button>
+      </div>
+    </div>
+  </div>
+  

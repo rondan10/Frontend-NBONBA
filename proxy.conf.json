@@ -1,0 +1,10 @@
+{
+    "/api": {
+      "target": "http://172.19.91.127:20000",
+      "secure": false,
+      "changeOrigin": true,
+      "pathRewrite": {
+        "^/api": "/AuditoriaWS"
+      }
+    }
+}

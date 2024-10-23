@@ -1,0 +1,81 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+  }
+  
+  .login-container {
+    width: 100%;
+    max-width: 600px;
+    margin: 0 auto;
+    border: 1px solid #ccc;
+  }
+  
+  .header {
+    background-color: #e31b23;
+    color: white;
+    padding: 10px;
+    text-align: center;
+  }
+  
+  .header h2 {
+    margin: 0;
+    font-size: 18px;
+  }
+  
+  .login-box {
+    padding: 20px;
+    background-color: #f0f0f0;
+  }
+  
+  .logo-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .claro-logo {
+    width: 80px;
+  }
+  
+  .america-movil-logo {
+    width: 120px;
+  }
+  
+  .login-info {
+    background-color: white;
+    border: 1px solid #ccc;
+    padding: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .login-info div {
+    display: flex;
+    margin-bottom: 10px;
+  }
+  
+  .login-info label {
+    width: 80px;
+    font-weight: bold;
+    text-align: right;
+    margin-right: 10px;
+  }
+  
+  .login-info input {
+    flex-grow: 1;
+    border: none;
+    background-color: transparent;
+  }
+  
+  .login-button {
+    text-align: center;
+  }
+  
+  .login-button button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    cursor: pointer;
+    font-weight: bold;
+  }
