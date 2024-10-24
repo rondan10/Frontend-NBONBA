@@ -1,32 +1,4 @@
-type DataPowerUrls = {
-  [key: string]: string;
-};
-
-// Luego, definimos la interfaz para nuestro objeto environment
-interface Environment {
-  production: boolean;
-  consultaClavesUrl: string;
-  codigoAplicacion: string;
-  usuarioAplicacion: string;
-  claveAplicacion: string;
-  applicationCode : string;
-  leerDatosUsuarioUrl: string;
-  leerOpcionesPorUsuarioUrl:string;
-  dataPowerUrls: DataPowerUrls;
-  wsTimeOut: string;
-  usrDatapower: string;
-  passDatapower: string;
-  dataPowerConfig: {
-    consumer: string;
-    country: string;
-    language: string;
-    system: string;
-    wsIp: string;
-  };
-}
-
-// Ahora, definimos nuestro objeto environment con el tipo correcto
-export const environment: Environment = {
+export const environment = {
   production: false,
   consultaClavesUrl: 'http://localhost:3000/proxy-soap',
   codigoAplicacion: 'SISACT',
@@ -38,8 +10,9 @@ export const environment: Environment = {
   },
   wsTimeOut: '30000',
   applicationCode : '109',
-  leerOpcionesPorUsuarioUrl : '/api/ebsAuditoria',
-  leerDatosUsuarioUrl :'/api/ebsAuditoria',
+  leerDatosUsuarioUrl: '/api/v1.0/MIG1_plataforma-empresarial/enterprise_Domain/administrative/auditoria/leerDatosUsuario',
+  leerOpcionesPorUsuarioUrl: '/api/v1.0/MIG1_plataforma-empresarial/enterprise_Domain/administrative/auditoria/leerOpcionesPorUsuario',
+  registroAuditoriaUrl : 'api/v1.0/MIG1_plataforma-empresarial/enterprise_Domain/administrative/auditoria/registroAuditoria',
   usrDatapower: 'usrPortSiacU',
   passDatapower: 'Q@ve123456',
   dataPowerConfig: {

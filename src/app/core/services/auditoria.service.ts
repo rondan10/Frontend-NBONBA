@@ -1,18 +1,17 @@
+// auditoria.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, from, throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
+import { SoapService } from './datapower-soap/soap.service';
+import { SoapHeader, AccesoRequest } from '../models/datapower-soap.model';
 import { environment } from '../../../environments/environment';
 import * as xml2js from 'xml2js';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class AuditoriaService {
-  private baseUrl = environment.leerDatosUsuarioUrl;;  
-  private applicationCode = environment.applicationCode;
-
-  constructor(private http: HttpClient) {}
+  constructor(private soapService: SoapService) {}
 
   private parseXMLResponse(xmlString: string): Promise<any> {
     return new Promise((resolve, reject) => {
@@ -27,48 +26,34 @@ export class AuditoriaService {
     });
   }
 
-  leerDatosUsuario(usuario: string): Observable<string> {
-    const soapRequest = `
-      <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:ws="http://pe/com/claro/esb/services/auditoria/ws" xmlns:acc="http://pe/com/claro/esb/services/auditoria/schemas/accesos/Acceso.xsd">
-        <soapenv:Header/>
-        <soapenv:Body>
-          <ws:leerDatosUsuario>
-            <acc:AccesoRequest>
-              <acc:usuario>${usuario}</acc:usuario>
-              <acc:aplicacion>${this.applicationCode}</acc:aplicacion>
-            </acc:AccesoRequest>
-          </ws:leerDatosUsuario>
-        </soapenv:Body>
-      </soapenv:Envelope>`;
+  leerDatosUsuario(header: SoapHeader, usuario: string): Observable<string> {
+    const accesoRequest: AccesoRequest = { usuario, aplicacion: environment.applicationCode };
+    const namespaces = {
+      ws: "http://pe/com/claro/esb/services/auditoria/ws",
+      acc: "http://pe/com/claro/esb/services/auditoria/schemas/accesos/Acceso.xsd",
+      v1: "http://claro.com.pe/generic/messageFormat/v1.0/",
+      v2: "http://claro.com.pe/esb/data/commonBusinessEntities/claroGenericHeaders/v2/"
+    };
+    const requestConfig = { prefix: 'acc', requestElement: 'AccesoRequest' };
+    const soapRequest = this.soapService.buildSoapRequest(header, accesoRequest, 'leerDatosUsuario', namespaces, requestConfig);
 
-    const headers = new HttpHeaders({
-      'Content-Type': 'text/xml',
-      'Accept': 'text/xml'
-    });
-
-    return this.http.post(this.baseUrl, soapRequest, { headers, responseType: 'text' })
-      .pipe(
-        switchMap(response => {
-          console.log('Raw XML response:', response);
-          return from(this.parseXMLResponse(response));
-        }),
-        map(parsedResponse => {
-          console.log('Parsed XML response:', JSON.stringify(parsedResponse, null, 2));
-          
-          // Intentar encontrar el código en la estructura XML
-          let codigo = this.findCodigoInResponse(parsedResponse);
-          
-          if (!codigo) {
-            throw new Error('No se pudo encontrar el código en la respuesta XML');
-          }
-          
-          return codigo;
-        }),
-        catchError(error => {
-          console.error('Error in leerDatosUsuario:', error);
-          return throwError(() => new Error('Error processing response: ' + error.message));
-        })
-      );
+    return this.soapService.sendSoapRequest(
+      environment.leerDatosUsuarioUrl,
+      soapRequest,
+      header.username,
+      header.password
+    )
+    .pipe(
+      switchMap(response => from(this.parseXMLResponse(response))),
+      map(parsedResponse => {
+        const codigo = this.findCodigoInResponse(parsedResponse);
+        if (codigo === null) {
+          throw new Error('Código no encontrado en la respuesta');
+        }
+        return codigo;
+      }),
+      catchError(error => throwError(() => new Error('Error processing response: ' + error.message)))
+    );
   }
 
   private findCodigoInResponse(obj: any): string | null {
@@ -77,11 +62,11 @@ export class AuditoriaService {
     }
 
     for (let key in obj) {
-      if (key.toLowerCase().includes('codigo') || key.toLowerCase().includes('code')) {
+      if (key.toLowerCase().includes('codigo')) {
         return obj[key].toString();
       }
       if (typeof obj[key] === 'object') {
-        let result = this.findCodigoInResponse(obj[key]);
+        const result = this.findCodigoInResponse(obj[key]);
         if (result) {
           return result;
         }
@@ -91,27 +76,38 @@ export class AuditoriaService {
     return null;
   }
 
-  leerOpcionesPorUsuario(codigo: string): Observable<any> {
-    const soapRequest = `
-      <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" 
-                       xmlns:ws="http://pe/com/claro/esb/services/auditoria/ws" 
-                       xmlns:opc="http://pe/com/claro/esb/services/auditoria/schemas/accesos/OpcionesUsuario.xsd">
-        <soapenv:Header/>
-        <soapenv:Body>
-          <ws:leerOpcionesPorUsuario>
-            <opc:OpcionesUsuarioRequest>
-              <opc:usuario>${codigo}</opc:usuario>
-              <opc:aplicacion>${this.applicationCode}</opc:aplicacion>
-            </opc:OpcionesUsuarioRequest>
-          </ws:leerOpcionesPorUsuario>
-        </soapenv:Body>
-      </soapenv:Envelope>`;
+  leerOpcionesPorUsuario(header: SoapHeader, codigo: string): Observable<any> {
+    const accesoRequest: AccesoRequest = { usuario: codigo, aplicacion: environment.applicationCode };
 
-    const headers = new HttpHeaders({
-      'Content-Type': 'text/xml',
-      'Accept': 'text/xml'
-    });
+    const namespaces = {
+      ws: "http://pe/com/claro/esb/services/auditoria/ws",
+      opc: "http://pe/com/claro/esb/services/auditoria/schemas/accesos/OpcionesUsuario.xsd",
+      v1: "http://claro.com.pe/generic/messageFormat/v1.0/",
+      v2: "http://claro.com.pe/esb/data/commonBusinessEntities/claroGenericHeaders/v2/"
+    };
 
-    return this.http.post(this.baseUrl, soapRequest, { headers, responseType: 'text' });
+    const requestConfig = { prefix: 'opc', requestElement: 'OpcionesUsuarioRequest' };
+    const soapRequest = this.soapService.buildSoapRequest(header, accesoRequest, 'leerOpcionesPorUsuario', namespaces, requestConfig);
+
+    return this.soapService.sendSoapRequest(
+      environment.leerOpcionesPorUsuarioUrl,
+      soapRequest,
+      header.username,
+      header.password
+    );
   }
+
+  registroAuditoria(header: SoapHeader, audit: any, registroRequest: any): Observable<any> {
+    const soapRequest = this.soapService.buildRegistroAuditoriaRequest(header, audit, registroRequest);
+  
+    return this.soapService.sendSoapRequest(
+      environment.registroAuditoriaUrl, // Asegúrate de tener esta URL en tu environment
+      soapRequest,
+      header.username,
+      header.password
+    ).pipe(
+      catchError(error => throwError(() => new Error('Error processing registroAuditoria response: ' + error.message)))
+    );
+  }
+
 }
