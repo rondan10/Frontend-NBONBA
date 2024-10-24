@@ -1,1 +1,48 @@
-<p>consulta-ofertas works!</p>
+<div class="search-container">
+    <div class="header">
+      <img src="https://img.onesignal.com/permanent/d06b9ca0-29c7-4577-b943-0ccc2296219a/Tu7HBEpfSTWvBwK79mUr_c6590db6-61f1-4548-9de5-ad662e8cd4f0.png" alt="Claro logo" class="logo">
+      <h1>CLARO TE RECOMIENDA</h1>
+      <p>Búsqueda de promociones</p>
+      <div class="session-info">
+        <span class="icon">👤</span>
+        <span class="user-info">C17383 - ADRIAN MOISES RONDAN CARLOS</span>
+        <span class="session-info">{{ sessionInfo}}</span>
+        <span class="menu">≡≡</span>
+        <span class="notifications">16</span>
+      </div>
+    </div>
+    <form>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="tipoDocumento">Tipo de Documento</label>
+          <select id="tipoDocumento" formControlName="tipoDocumento">
+            <option value="DNI">DNI</option>
+            <option value="RUC">RUC</option>
+            <option value="DNI">CE</option>
+            <option value="DNI">PASAPORTE</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="nDocumento">N° Documento</label>
+          <input id="nDocumento" formControlName="nDocumento" type="text">
+        </div>
+        <div class="form-group">
+          <label for="linea">Línea</label>
+          <input id="linea" formControlName="linea" type="text">
+        </div>
+        <div class="form-group">
+          <label for="cuenta">Cuenta</label>
+          <input id="cuenta" formControlName="cuenta" type="text">
+        </div>
+        <div class="form-group">
+          <label for="contrato">Contrato</label>
+          <input id="contrato" formControlName="contrato" type="text">
+        </div>
+        <div class="form-group">
+          <label for="tipo">Tipo</label>
+          <input id="tipo" formControlName=" tipo" type="text">
+        </div>
+        <button type="submit">Buscar</button>
+      </div>
+    </form>
+  </div>

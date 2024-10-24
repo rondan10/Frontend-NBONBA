@@ -9,4 +9,11 @@ import { Component } from '@angular/core';
 })
 export class ConsultaOfertasComponent {
 
+  sessionInfo: string = '';
+
+  setSessionInfo() {
+    const now = new Date();
+    this.sessionInfo = `Session ID : ${now.getTime()} ${now.toLocaleDateString()} ${now.toLocaleTimeString()}`;
+  }
+
 }
