@@ -1,11 +1,9 @@
-// auditoria.service.ts
 import { Injectable } from '@angular/core';
 import { Observable, from, throwError } from 'rxjs';
 import { catchError, map, switchMap } from 'rxjs/operators';
 import { SoapService } from './datapower-soap/soap.service';
 import { SoapHeader, AccesoRequest } from '../models/datapower-soap.model';
 import { environment } from '../../../environments/environment';
-import * as xml2js from 'xml2js';
 
 @Injectable({
   providedIn: 'root'
@@ -15,15 +13,58 @@ export class AuditoriaService {
 
   private parseXMLResponse(xmlString: string): Promise<any> {
     return new Promise((resolve, reject) => {
-      const parser = new xml2js.Parser({ explicitArray: false, mergeAttrs: true });
-      parser.parseString(xmlString, (err, result) => {
-        if (err) {
-          reject(err);
-        } else {
-          resolve(result);
-        }
-      });
+      try {
+        const parser = new DOMParser();
+        const xmlDoc = parser.parseFromString(xmlString, 'text/xml');
+        const result = this.xmlToJson(xmlDoc.documentElement);
+        resolve(result);
+      } catch (err) {
+        reject(err);
+      }
     });
+  }
+
+  // Función auxiliar para convertir XML a JSON
+  private xmlToJson(node: Element): any {
+    const result: any = {};
+
+    // Procesar atributos
+    if (node.hasAttributes()) {
+      const attrs = node.attributes;
+      for (let i = 0; i < attrs.length; i++) {
+        const attr = attrs[i];
+        result[attr.nodeName] = attr.nodeValue;
+      }
+    }
+
+    // Procesar nodos hijo
+    let hasChildren = false;
+    if (node.hasChildNodes()) {
+      const children = node.childNodes;
+      for (let i = 0; i < children.length; i++) {
+        const item = children[i];
+        if (item.nodeType === Node.ELEMENT_NODE) {
+          hasChildren = true;
+          const childElement = item as Element;
+          const nodeName = childElement.nodeName;
+          
+          if (typeof(result[nodeName]) === 'undefined') {
+            result[nodeName] = this.xmlToJson(childElement);
+          } else {
+            if (!Array.isArray(result[nodeName])) {
+              const tmp = result[nodeName];
+              result[nodeName] = [tmp];
+            }
+            result[nodeName].push(this.xmlToJson(childElement));
+          }
+        } else if (item.nodeType === Node.TEXT_NODE && item.nodeValue?.trim()) {
+          // Solo guardar texto si no está vacío
+          return item.nodeValue.trim();
+        }
+      }
+    }
+
+    return hasChildren ? result : node.textContent?.trim() || '';
   }
 
   leerDatosUsuario(header: SoapHeader, usuario: string): Observable<string> {
@@ -101,7 +142,7 @@ export class AuditoriaService {
     const soapRequest = this.soapService.buildRegistroAuditoriaRequest(header, audit, registroRequest);
   
     return this.soapService.sendSoapRequest(
-      environment.registroAuditoriaUrl, // Asegúrate de tener esta URL en tu environment
+      environment.registroAuditoriaUrl,
       soapRequest,
       header.username,
       header.password
@@ -109,5 +150,4 @@ export class AuditoriaService {
       catchError(error => throwError(() => new Error('Error processing registroAuditoria response: ' + error.message)))
     );
   }
-
 }
