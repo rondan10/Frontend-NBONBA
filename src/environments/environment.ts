@@ -21,5 +21,9 @@ export const environment = {
     language: 'PE',
     system: 'validarComunicacion',
     wsIp: '172.19.84.167'
-  }
+  },
+  oidc: {
+    authority : 'https://adfs1.claro.com.pe/adfs',
+    clientId : '0fec5da7-3366-4843-873e-04562d63ce6c'
+  } 
 };

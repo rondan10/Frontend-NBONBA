@@ -5,6 +5,7 @@ import { User } from '../../core/models/user_login.model';
 import { OpcionesUsuarioRequest } from '../../core/models/leerOpcionesXUsuario.model';
 import { catchError, of, switchMap } from 'rxjs';
 import { SoapHeader } from '../../core/models/datapower-soap.model';
+
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
